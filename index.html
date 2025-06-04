@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>匿名心聲轉述小幫手</title>
   <style>
     body {
@@ -21,16 +21,22 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 2rem;
       max-width: 600px;
+      width: 100%;
       text-align: center;
     }
     .card h1 {
       font-size: 1.8rem;
       margin-bottom: 1rem;
     }
-    .card p {
+    .card textarea {
+      width: 100%;
+      height: 120px;
+      padding: 1rem;
       font-size: 1rem;
-      line-height: 1.6;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+      resize: vertical;
     }
     .button {
       background-color: #4f46e5;
@@ -40,25 +46,49 @@
       border: none;
       border-radius: 0.5rem;
       cursor: pointer;
-      text-decoration: none;
+      margin-bottom: 1rem;
     }
     .button:hover {
       background-color: #4338ca;
+    }
+    .response {
+      font-size: 1rem;
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      white-space: pre-wrap;
+      text-align: left;
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>匿名心聲轉述小幫手</h1>
-    <p>
-      想分享心情但不想被認出來？<br>
-      本工具幫你將訊息轉譯成匿名版本，<br>
-      同時保留你的情緒與語氣。<br><br>
-      點擊下方按鈕，即可使用 AI 助手轉述你的話。
-    </p>
-    <a href="https://poe.com/BotRZ8L4ABR81" class="button" target="_blank">
-      前往轉述助手
-    </a>
+    <textarea id="userInput" placeholder="請輸入你想轉述的內容..."></textarea>
+    <button class="button" onclick="sendMessage()">送出轉述</button>
+    <div id="response" class="response"></div>
   </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput").value;
+      const responseBox = document.getElementById("response");
+      responseBox.textContent = "請稍候，正在轉述中...";
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: input })
+        });
+
+        const data = await res.json();
+        responseBox.textContent = data.reply;
+      } catch (error) {
+        responseBox.textContent = "出錯了，請稍後再試。";
+        console.error("Error:", error);
+      }
+    }
+  </script>
 </body>
 </html>
